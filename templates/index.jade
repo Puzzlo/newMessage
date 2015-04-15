@@ -1,0 +1,21 @@
+doctype
+html
+    head
+        title="chat?"
+        script(src='/chat.js')
+        script(src='/socket.io/socket.io.js')
+        style
+            include ../public/css/style.css
+    body
+        #simple
+        #usersOnline
+        .clearfix
+        #vvod
+            form#forma(action='', onsubmit='return false')
+                input#textOfMessage
+                input#send(type='submit', value='send message')
+        .clearfix
+        #confirmSended
+        #confirmReceived
+        #private
+

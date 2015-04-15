@@ -1,0 +1,49 @@
+#simple{
+    width: 50%;
+    min-height: 400px;
+    float: left;
+    border: 1px solid #279545;
+}
+#usersOnline{
+    width: 40%;
+    height: 30%;
+    float: left;
+    border: 1px solid #955191;
+
+}
+#vvod {
+    width: 50%;
+    /*height: 35px;*/
+    position: relative;
+}
+#textOfMessage {
+    margin: 10px 10px 0 0;
+    width: 79%;
+    height: 60px;
+}
+#send {
+    margin: 10px 0 0 0;
+    width: 19%;
+    height: 25px;
+}
+#confirmSended, #confirmReceived,  #private {
+    width: 48%;
+    height: 200px;
+    overflow-y: auto;
+    border: 1px solid #131895;
+    margin: 5px;
+    float: left;
+}
+.clearfix {
+    content: " "; /* Older browser do not support empty content */
+    visibility: hidden;
+    display: block;
+    height: 0;
+    clear: both;
+}
+.confirmRed {
+    background: red;
+}
+.confirmGreen {
+    background: lightseagreen;
+}
