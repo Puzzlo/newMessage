@@ -27,4 +27,16 @@ io.sockets.on('connection', function(client){
         io.sockets.emit('drawUsers', users);
     });
 
+    client.on('sendMessageToServer', function(data){
+        //console.log('cabj here');
+        //client.emit('drawUsers', users);
+        if(Object.keys(data.confirm).length > 0){
+            for( sender in data.confirm) {
+                //console.log('sender='+sender);
+                //console.log('sender_value='+sender.value  );
+                io.sockets.connected[sender].emit('toConfirm', {message: data.message });
+            }
+        }
+    });
+
 });  // end of sockets connection

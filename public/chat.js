@@ -3,13 +3,15 @@
  */
 var socket;
 var messages = {};
+var privateRecipients = [];
+var confirmRecipients = {};
 
 window.onload = function() {
     socket = io.connect('http://localhost:3000');
 
     var simpleMessages = [];
-    var privateRecipients = [];
-    var confirmRecipients = [];
+    var confirmReceived = '<list id="listToConfirm"></list>';
+    document.getElementById('confirmReceived').innerHTML = confirmReceived;
 
     // переделать на нормальный вход в чат :
     var name = prompt('Ваше имя : ', 'Annabelle');
@@ -34,9 +36,9 @@ window.onload = function() {
             html += '<tr><td>' + data[user].name + '</td>'
             +'<td>'+'<input type="checkbox" '
             //+'onchange="changePrivate();">'+'</td>'
-            +'onchange="changeRecipients(\''+data[user].id+'\', \'' + privateRecipients + '\');">'+'</td>'
+            +'onchange="changePrivateRecipients(\''+data[user].id + '\');">'+'</td>'
             +'<td>'+'<input type="checkbox" '
-            +'onchange="changeRecipients(\''+data[user].id+'\', ' + confirmRecipients + ');">'+'</td>'
+            +'onchange="changeConfirmRecipients(\''+data[user].id+'\');">'+'</td>'
             +'</td></tr>';
         }
         html += '</table>';
@@ -45,17 +47,46 @@ window.onload = function() {
         console.log(html);
 
     });
+
+    forma.onsubmit = function () {
+        var message = document.getElementById('textOfMessage');
+        console.log(message.value);
+        socket.emit('sendMessageToServer', {idDate: new Date(), message: message.value, priv: privateRecipients, confirm: confirmRecipients});
+        privateRecipients = [];
+        confirmRecipients = {};
+        document.getElementById('textOfMessage').value = '';
+        return false;
+    };
+
+    socket.on('toConfirm', function (data) {
+        var list = document.getElementById('listToConfirm');
+        var mB = document.createElement('li');
+        mB.innerHTML = data.message + '  <button onclick = " ">Подтвердить</button>';
+       list.appendChild(mB);
+    });
 };
 
-function changeRecipients(id, recipArray) {
-    console.log(recipArray);
+
+
+
+
+function changePrivateRecipients(id) {
+    //console.log(recipArray);
     //for  ( var i in recipArray) console.log(i);
-    //var index = recipArray.indexOf(id);
-    //if (  index == -1 ) {
-    //    recipArray.push(id);
-    //}else {
-    //    recipArray.splice(index, 1);
-    //}
-    //return recipArray;
-    console.log('end of func arr = '+ recipArray);
+    var index = privateRecipients.indexOf(id);
+    if (  index == -1 ) {
+        privateRecipients.push(id);
+    }else {
+        privateRecipients.splice(index, 1);
+    }
+    //console.log('end of func arr = '+ privateRecipients);
+}
+
+function changeConfirmRecipients(id) {
+    var index = confirmRecipients[id];
+    if(index != undefined)
+        delete confirmRecipients[id];
+    else confirmRecipients[id] = false;
+
+    //console.log('end of func arr = '+ JSON.stringify(confirmRecipients));
 }
