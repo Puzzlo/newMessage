@@ -31,12 +31,20 @@ io.sockets.on('connection', function(client){
         //console.log('cabj here');
         //client.emit('drawUsers', users);
         if(Object.keys(data.confirm).length > 0){
+
             for( sender in data.confirm) {
                 //console.log('sender='+sender);
                 //console.log('sender_value='+sender.value  );
-                io.sockets.connected[sender].emit('toConfirm', {message: data.message });
+                io.sockets.connected[sender].emit('toConfirm',
+                    {message: data.message, id: client.id});
+
             }
         }
+    });
+
+    client.on('accept', function (data) {
+        io.sockets.connected[data.whoAskConfirmId].emit('iConfirm' ,
+            {message: data.messageIsConfirmed, id: data.whoConfirmId});
     });
 
 });  // end of sockets connection
