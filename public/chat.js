@@ -56,7 +56,7 @@ window.onload = function() {
     forma.onsubmit = function () {
         var message = document.getElementById('textOfMessage');
         //console.log(message.value);
-        var idMessage = new Date().toString();
+        var idMessage = new Date().getTime().toString();
         socket.emit('sendMessageToServer', {idDate: idMessage,
                                             idWhoSend: socket.id,
                                             message: message.value,
@@ -115,12 +115,14 @@ window.onload = function() {
         messagesWithConfirm.forEach(function(obj){
             //console.log('obj = '+ JSON.stringify(obj));
             //console.log('idDate=' + obj.idDate + '  messId = ' + data.messageId);
+            //console.log(typeof(data.messageId));
             //console.log('data = '+ JSON.stringify(data));
            if(obj.idDate ===  data.messageId) {
                //console.log('im in');
                obj.confirm[data.id] = true;
            }
         });
+        reDrawConfirmList();
         console.log('messagesWithConfirm = '+ JSON.stringify(messagesWithConfirm));
     });
 
@@ -169,4 +171,24 @@ function changeConfirmRecipients(id, name) {
     }
 
     //console.log('confrec = '+ JSON.stringify(confirmRecipients));
+}
+
+function reDrawConfirmList(){
+    var tableConf = document.getElementById('confirmSended');
+    var elems = tableConf.getElementsByTagName('li');
+    messagesWithConfirm.forEach(function(obj){
+        for(var i= 0, len = elems.length; i<len; i++){
+            if(obj.idDate == elems[i].id){
+                //console.log('elems['+ i+']='+elems[i].id);
+                //elems[i].className = elems[i].className.replace('confirmRed', 'confirmGreen');
+                for(var j=1; j < elems[i].childNodes.length; j++) {
+                    //console.log(elems[i].childNodes[j]);
+                    console.log(elems[i].childNodes[j].innerHTML);
+                    //console.log(elems[i].childNodes[j].nodeValue);
+                }
+
+            }
+
+        }
+    });
 }
