@@ -36,15 +36,19 @@ io.sockets.on('connection', function(client){
                 //console.log('sender='+sender);
                 //console.log('sender_value='+sender.value  );
                 io.sockets.connected[sender].emit('toConfirm',
-                    {message: data.message, id: client.id});
+                    {messageId: data.idDate,
+                        id: client.id,
+                        userToConf: users,
+                        message: data.message});
 
+                //console.log('users = '+ JSON.stringify(users));
             }
         }
     });
 
     client.on('accept', function (data) {
         io.sockets.connected[data.whoAskConfirmId].emit('iConfirm' ,
-            {message: data.messageIsConfirmed, id: data.whoConfirmId});
+            {messageId: data.messageId, id: data.whoConfirmId});
     });
 
 });  // end of sockets connection

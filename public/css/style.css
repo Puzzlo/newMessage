@@ -1,6 +1,7 @@
 #simple{
     width: 50%;
-    min-height: 400px;
+    min-height: 200px;
+    max-height: 200px;
     float: left;
     border: 1px solid #279545;
 }
@@ -33,6 +34,7 @@
     border: 1px solid #131895;
     margin: 5px;
     float: left;
+    padding: 3px;
 }
 .clearfix {
     content: " "; /* Older browser do not support empty content */
@@ -43,6 +45,7 @@
 }
 .confirmRed {
     background: red;
+    margin: 0 3px;
 }
 .confirmGreen {
     background: lightseagreen;

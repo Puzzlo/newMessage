@@ -2,9 +2,11 @@
  * Created by esskov on 15.04.2015.
  */
 var socket;
-var messages = {};
+var messages = [];
+var messagesWithConfirm = [];
 var privateRecipients = [];
 var confirmRecipients = {};
+var users = {};
 
 window.onload = function() {
     socket = io.connect('http://localhost:3000');
@@ -45,28 +47,42 @@ window.onload = function() {
         }
         html += '</table>';
         usersOnline.innerHTML = html;
+        users = data;
 
-        console.log(html);
+        //console.log(html);
 
     });
 
     forma.onsubmit = function () {
         var message = document.getElementById('textOfMessage');
-        console.log(message.value);
-        var idMessage = new Date();
+        //console.log(message.value);
+        var idMessage = new Date().toString();
         socket.emit('sendMessageToServer', {idDate: idMessage,
                                             idWhoSend: socket.id,
                                             message: message.value,
                                             priv: privateRecipients,
                                             confirm: confirmRecipients });
+
+        //console.log('messages = '+ JSON.stringify(messages));
+
         if(Object.keys(confirmRecipients).length > 0){
             // есть получатели с подтверждением
+
+            messagesWithConfirm.push(
+                { idDate: idMessage,
+                    idWhoSend: socket.id,
+                    message: message.value,
+                    priv: privateRecipients,
+                    confirm: confirmRecipients
+                }
+            );
             var list = document.getElementById('listSendedToConfirm');
             var newLi = document.createElement('li');
             newLi.id = idMessage;
             var mess = message.value;
+            //console.log('confrec = '+ JSON.stringify(confirmRecipients));
             for ( var man in confirmRecipients) {
-                mess += '<span class="confirmRed">' + man + '</span>';
+                mess += '<span class="confirmRed">' + users[man].name + '</span>';
             }
             newLi.innerHTML = mess;
             list.appendChild(newLi);
@@ -80,20 +96,39 @@ window.onload = function() {
     socket.on('toConfirm', function (data) {
         var list = document.getElementById('listToConfirm');
         var mB = document.createElement('li');
-        mB.innerHTML = data.message + '  <button onclick = "confirm(\'' + data.message + '\',\''
-                        + data.id + '\');">Подтвердить</button>';
+        //console.log(data.users[data.id].name);
+        mB.innerHTML = 'От ' +  data.userToConf[data.id].name +  ' : '+ data.message + '  <button onclick = "confirm(\'' + data.messageId + '\',\''
+                        +  data.userToConf[data.id].id + '\');">Подтвердить</button>';
        list.appendChild(mB);
     });
 
     socket.on('iConfirm', function(data){
-       alert(data.message);
+        //for ( mess in messagesWithConfirm) {
+        //    console.log('mess = '+ JSON.stringify(mess));
+        //    if(messagesWithConfirm[mess].id == data.messageId){
+        //        messagesWithConfirm[mess].confirm[data.id] = true;
+        //        console.log('confirm = ' + messagesWithConfirm[mess].confirm[data.id]);
+        //    }
+        //}
+        //console.log('messagesWithConfirm = '+ JSON.stringify(messagesWithConfirm));
+        //console.log('users = '+ JSON.stringify(users));
+        messagesWithConfirm.forEach(function(obj){
+            //console.log('obj = '+ JSON.stringify(obj));
+            //console.log('idDate=' + obj.idDate + '  messId = ' + data.messageId);
+            //console.log('data = '+ JSON.stringify(data));
+           if(obj.idDate ===  data.messageId) {
+               //console.log('im in');
+               obj.confirm[data.id] = true;
+           }
+        });
+        console.log('messagesWithConfirm = '+ JSON.stringify(messagesWithConfirm));
     });
 
 
 };
 
 
-function confirm(message, id){
+function confirm(messageId, id){
     //console.log('confrec = '+ JSON.stringify(confirmRecipients));
     //var index = confirmRecipients[id];
     //console.log(index);
@@ -102,7 +137,7 @@ function confirm(message, id){
         socket.emit('accept',
             {whoConfirmId: socket.id,
             whoAskConfirmId: id,
-            messageIsConfirmed: message });
+            messageId: messageId });
     //}else{
     //    console.log('не нашёл кого менять на труе');
     //}
@@ -133,5 +168,5 @@ function changeConfirmRecipients(id, name) {
     //confirmRecipients[id].push(n);
     }
 
-    console.log('confrec = '+ JSON.stringify(confirmRecipients));
+    //console.log('confrec = '+ JSON.stringify(confirmRecipients));
 }
