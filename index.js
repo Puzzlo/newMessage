@@ -43,12 +43,25 @@ io.sockets.on('connection', function(client){
 
                 //console.log('users = '+ JSON.stringify(users));
             }
+        }else if(Object.keys(data.priv).length > 0){
+            console.log('private messages = '+ JSON.stringify(data.priv));
+         // есть приватные получатели. нет с подтверждением ( условие задачи )
+            for(var i=0; i<data.priv.length; i++){
+                io.sockets.connected[data.priv[i]].emit('privateMessage',
+                    { message: data.message,
+                        idWho: data.idWhoSend
+                    });
+            }
         }
     });
 
     client.on('accept', function (data) {
         io.sockets.connected[data.whoAskConfirmId].emit('iConfirm' ,
             {messageId: data.messageId, id: data.whoConfirmId});
+    });
+    client.on('disconnect', function(data){
+
+       console.log('disconnect '+client.id);
     });
 
 });  // end of sockets connection

@@ -1,9 +1,11 @@
 #simple{
-    width: 50%;
+    width: 99%;
     min-height: 200px;
     max-height: 200px;
     float: left;
     border: 1px solid #279545;
+    overflow-y: auto;
+    word-wrap: break-word;
 }
 #usersOnline{
     width: 40%;
@@ -17,11 +19,11 @@
     /*height: 35px;*/
     position: relative;
 }
-#textOfMessage {
-    margin: 10px 10px 0 0;
-    width: 79%;
-    height: 60px;
-}
+/*#textOfMessage {*/
+    /*margin: 10px 10px 0 0;*/
+    /*width: 79%;*/
+    /*height: 60px;*/
+/*}*/
 #send {
     margin: 10px 0 0 0;
     width: 19%;
@@ -35,6 +37,7 @@
     margin: 5px;
     float: left;
     padding: 3px;
+    word-wrap: break-word;
 }
 .clearfix {
     content: " "; /* Older browser do not support empty content */
@@ -49,4 +52,15 @@
 }
 .confirmGreen {
     background: lightseagreen;
+    margin: 0 3px;
+}
+fieldset#fieldMain {
+    padding: 1px;
+    width: 50%;
+    float: left;
+}
+textarea#textOfMessage {
+    margin: 10px 10px 0 0;
+    width: 79%;
+    height: 60px;
 }

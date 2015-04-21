@@ -1,18 +1,20 @@
 doctype
 html
     head
-        title="chat?"
+        title="Nothing!"
         script(src='/chat.js')
         script(src='/socket.io/socket.io.js')
         style
             include ../public/css/style.css
     body
-        #simple
+        fieldset#fieldMain
+            #simple
+            legend='Общий чат'
         #usersOnline
         .clearfix
         #vvod
             form#forma(action='', onsubmit='return false')
-                input#textOfMessage
+                textarea#textOfMessage
                 input#send(type='submit', value='send message')
         .clearfix
         #confirmSended

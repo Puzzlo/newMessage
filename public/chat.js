@@ -3,6 +3,7 @@
  */
 var socket;
 var messages = [];
+var privateMessages = [];
 var messagesWithConfirm = [];
 var privateRecipients = [];
 var confirmRecipients = {};
@@ -18,8 +19,10 @@ window.onload = function() {
     document.getElementById('confirmSended').innerHTML = confirmSended;
 
     // переделать на нормальный вход в чат :
-    var name = prompt('Ваше имя : ', 'Annabelle');
-    socket.emit('hello', {name: name});
+    if(!name){
+        var name = prompt('Ваше имя : ', 'Annabelle');
+        socket.emit('hello', {name: name});
+    }
 
     // сообщения при входе в чат вошедшему, остальным что он пришёл
     socket.on('simpleMessage', function(data){
@@ -86,44 +89,46 @@ window.onload = function() {
             }
             newLi.innerHTML = mess;
             list.appendChild(newLi);
+        //}else if ( Object.keys(privateRecipients).length > 0){
+        //    // нет получателей с подтверждением, зато есть приватные беседы, приватные получатели
+        //
         }
+        uncheckAllcheckboxes();
+
+
         privateRecipients = [];
         confirmRecipients = {};
         document.getElementById('textOfMessage').value = '';
+
         return false;
     };
 
+    // вывод сообщения и кнопки "подтвердить"
     socket.on('toConfirm', function (data) {
         var list = document.getElementById('listToConfirm');
         var mB = document.createElement('li');
         //console.log(data.users[data.id].name);
-        mB.innerHTML = 'От ' +  data.userToConf[data.id].name +  ' : '+ data.message + '  <button onclick = "confirm(\'' + data.messageId + '\',\''
-                        +  data.userToConf[data.id].id + '\');">Подтвердить</button>';
+        mB.innerHTML = 'От ' +  data.userToConf[data.id].name +  ' : '+ data.message + '  <button onclick = "confirm(\''
+                        + data.messageId + '\',\''
+                        +  data.userToConf[data.id].id + '\');this.disabled=true;">Подтвердить</button>';
        list.appendChild(mB);
     });
 
+    // перерисовка списка сообщений с подтверждением и списка тех, кто подтвердил
     socket.on('iConfirm', function(data){
-        //for ( mess in messagesWithConfirm) {
         //    console.log('mess = '+ JSON.stringify(mess));
-        //    if(messagesWithConfirm[mess].id == data.messageId){
-        //        messagesWithConfirm[mess].confirm[data.id] = true;
-        //        console.log('confirm = ' + messagesWithConfirm[mess].confirm[data.id]);
-        //    }
-        //}
-        //console.log('messagesWithConfirm = '+ JSON.stringify(messagesWithConfirm));
-        //console.log('users = '+ JSON.stringify(users));
         messagesWithConfirm.forEach(function(obj){
-            //console.log('obj = '+ JSON.stringify(obj));
-            //console.log('idDate=' + obj.idDate + '  messId = ' + data.messageId);
-            //console.log(typeof(data.messageId));
-            //console.log('data = '+ JSON.stringify(data));
            if(obj.idDate ===  data.messageId) {
-               //console.log('im in');
                obj.confirm[data.id] = true;
            }
         });
         reDrawConfirmList();
-        console.log('messagesWithConfirm = '+ JSON.stringify(messagesWithConfirm));
+    });
+
+    socket.on('privateMessage', function (data) {
+        var priv = document.getElementById('private');
+        privateMessages.push('From ' + findUserNameById(data.idWho) + ' : ' + data.message + '<br/>');
+        priv.innerHTML = privateMessages;
     });
 
 
@@ -131,32 +136,21 @@ window.onload = function() {
 
 
 function confirm(messageId, id){
-    //console.log('confrec = '+ JSON.stringify(confirmRecipients));
-    //var index = confirmRecipients[id];
-    //console.log(index);
-    //if(index != undefined){
-    //    confirmRecipients[socket.id] = true;
         socket.emit('accept',
             {whoConfirmId: socket.id,
             whoAskConfirmId: id,
             messageId: messageId });
-    //}else{
-    //    console.log('не нашёл кого менять на труе');
-    //}
 }
 
 
 
 function changePrivateRecipients(id) {
-    //console.log(recipArray);
-    //for  ( var i in recipArray) console.log(i);
     var index = privateRecipients.indexOf(id);
     if (  index == -1 ) {
         privateRecipients.push(id);
     }else {
         privateRecipients.splice(index, 1);
     }
-    //console.log('end of func arr = '+ privateRecipients);
 }
 
 function changeConfirmRecipients(id, name) {
@@ -164,13 +158,8 @@ function changeConfirmRecipients(id, name) {
     if(index != undefined)
         delete confirmRecipients[id];
     else {
-        //var n = {confirm: false, name: name};
         confirmRecipients[id] = false;
-        //confirmRecipients[id].name = name;
-    //confirmRecipients[id].push(n);
     }
-
-    //console.log('confrec = '+ JSON.stringify(confirmRecipients));
 }
 
 function reDrawConfirmList(){
@@ -179,16 +168,39 @@ function reDrawConfirmList(){
     messagesWithConfirm.forEach(function(obj){
         for(var i= 0, len = elems.length; i<len; i++){
             if(obj.idDate == elems[i].id){
-                //console.log('elems['+ i+']='+elems[i].id);
-                //elems[i].className = elems[i].className.replace('confirmRed', 'confirmGreen');
                 for(var j=1; j < elems[i].childNodes.length; j++) {
-                    //console.log(elems[i].childNodes[j]);
-                    console.log(elems[i].childNodes[j].innerHTML);
-                    //console.log(elems[i].childNodes[j].nodeValue);
+                    var sp = elems[i].childNodes[j];
+                    var idWhoConf = findUserIdByName(sp.innerHTML);
+                    for ( var whoConf in obj.confirm) {
+                        if(whoConf == idWhoConf && obj.confirm[whoConf] ){
+                            if(sp.className.match(/\bconfirmRed\b/)){
+                                sp.className = ' confirmGreen';
+                            }
+                        }
+                    }
+
                 }
 
             }
 
         }
     });
+}
+
+function findUserIdByName(name){
+    for ( var user in users){
+        if (users[user].name == name) return users[user].id;
+    }
+}
+function findUserNameById(id){
+    for ( var user in users){
+        if (users[user].id == id) return users[user].name;
+    }
+}
+
+function uncheckAllcheckboxes(){
+    var ch = document.getElementsByTagName("input");
+    for(var i=0;i<ch.length;i++) {
+        if (ch[i].type == 'checkbox' && ch[i].checked) ch[i].checked = !ch[i].checked;
+    }
 }
