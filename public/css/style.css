@@ -28,6 +28,7 @@
     margin: 10px 0 0 0;
     width: 19%;
     height: 25px;
+    padding: 0 0 2px 0 ;
 }
 #confirmSended, #confirmReceived,  #private {
     width: 48%;
@@ -65,8 +66,3 @@ textarea#textOfMessage {
     height: 60px;
 }
 
-legend.scheduler-border {
-    width:inherit; /* Or auto */
-    padding:0 10px; /* To give a bit of padding on the left and right */
-    border-bottom:none;
-}

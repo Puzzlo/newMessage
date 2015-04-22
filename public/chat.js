@@ -109,6 +109,7 @@ window.onload = function() {
     socket.on('toConfirm', function (data) {
         var list = document.getElementById('listToConfirm');
         var mB = document.createElement('li');
+        mB.className = 'list-group-item';
         //console.log(data.users[data.id].name);
         mB.innerHTML = 'От ' +  data.userToConf[data.id].name
                         +  ' : '

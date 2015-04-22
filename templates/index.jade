@@ -10,15 +10,15 @@ html
             include ../public/css/style.css
             include ../public/css/bootstrap.min.css
     body
-        fieldset#fieldMain.sheduler-border
+        fieldset#fieldMain
+            legend Основной чат
             #simple
-            legend.sheduler-border Общий чат
         #usersOnline
         .clearfix
         #vvod
             form#forma(action='', onsubmit='return false')
                 textarea#textOfMessage
-                input#send(type='submit', value='send message')
+                input#send.btn.btn-primary(type='submit', value='send message')
         .clearfix
         #confirmSended
         #confirmReceived
