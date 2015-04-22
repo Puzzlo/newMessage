@@ -10,7 +10,9 @@ var confirmRecipients = {};
 var users = {};
 
 window.onload = function() {
-    socket = io.connect('http://localhost:3000');
+    //socket = io.connect('http://localhost:3000');
+    socket = io.connect('192.168.0.67:3000');
+
 
     var simpleMessages = [];
     var confirmReceived = '<list id="listToConfirm"></list>';
@@ -108,9 +110,13 @@ window.onload = function() {
         var list = document.getElementById('listToConfirm');
         var mB = document.createElement('li');
         //console.log(data.users[data.id].name);
-        mB.innerHTML = 'От ' +  data.userToConf[data.id].name +  ' : '+ data.message + '  <button onclick = "confirm(\''
+        mB.innerHTML = 'От ' +  data.userToConf[data.id].name
+                        +  ' : '
+                        + data.message
+                        + '  <button class = "btn btn-xs btn-danger" onclick = "confirm(\''
                         + data.messageId + '\',\''
-                        +  data.userToConf[data.id].id + '\');this.disabled=true;">Подтвердить</button>';
+                        +  data.userToConf[data.id].id
+                        + '\');this.disabled=true;this.className = \'btn btn-xs btn-info\';">Подтвердить</button>';
        list.appendChild(mB);
     });
 
