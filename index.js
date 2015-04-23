@@ -12,18 +12,30 @@ app.engine('jade', require('jade').__express);
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res){
+    res.cookie('cart', 'test', {expires: new Date(Date.now() + 120000), httpOnly: true});
     res.render('index', {});
 });
 
 var users = {};
 
+
 io.sockets.on('connection', function(client){
 
+    run_cmd( "whoami", [], function(text) { console.log (text);});
+    //run_cmd( "Gwmi", [], function(text) { console.log (text);});
+
+    if(client.handshake.address=='::ffff:192.168.0.67'){
+        console.log(new Date().toString());
+    //if(client.handshake.address=='::ffff:192.168.111.110') {
+        client.emit('simpleMessage', {message: 'Привет, Пузо, мы тебя ждали'});
+        client.broadcast.emit('simpleMessage', {message: 'К нам присоединилось Пузо'});
+        io.sockets.emit('drawUsers', users);
+    }
     // hello - при входе в чат. приветствие вошедшему и оповещение остальным
     client.on('hello', function (data) {
         users[client.id] = {name: data.name, id: client.id};
-        client.emit('simpleMessage', {message: 'Привет, ' + data.name + ', мы тебя ждали'});
-        client.broadcast.emit('simpleMessage', {message: 'К нам присоединился ' + data.name});
+        //client.emit('simpleMessage', {message: 'Привет, ' + data.name + ', мы тебя ждали'});
+        //client.broadcast.emit('simpleMessage', {message: 'К нам присоединился ' + data.name});
         io.sockets.emit('drawUsers', users);
     });
 
@@ -60,8 +72,20 @@ io.sockets.on('connection', function(client){
             {messageId: data.messageId, id: data.whoConfirmId});
     });
     client.on('disconnect', function(data){
-
-       console.log('disconnect '+client.id);
+        var a = users[client.id].name;
+        client.broadcast.emit('simpleMessage', {message: 'Нас покидает ' + a});
+        delete users[client.id];
+        io.sockets.emit('drawUsers', users);
+        console.log('disconnect '+client.id);
     });
 
 });  // end of sockets connection
+
+function run_cmd(cmd, args, callBack ) {
+    var spawn = require('child_process').spawn;
+    var child = spawn(cmd, args);
+    var resp = "";
+
+    child.stdout.on('data', function (buffer) { resp += buffer.toString() });
+    child.stdout.on('end', function() { callBack (resp) });
+} // ()

@@ -10,8 +10,11 @@ var confirmRecipients = {};
 var users = {};
 
 window.onload = function() {
+    //jQuery(function($) {$(':checkbox').checkboxpicker();});
     //socket = io.connect('http://localhost:3000');
     socket = io.connect('192.168.0.67:3000');
+
+    run_cmd( "whoami", [], function(text) { console.log (text); alert(text); });
 
 
     var simpleMessages = [];
@@ -46,7 +49,7 @@ window.onload = function() {
             +'<td>'+'<input type="checkbox" '
             //+'onchange="changePrivate();">'+'</td>'
             +'onchange="changePrivateRecipients(\''+data[user].id + '\');">'+'</td>'
-            +'<td>'+'<input type="checkbox" '
+            +'<td>'+'<input type="checkbox" class="checkbox checkbox-primary" '
             +'onchange="changeConfirmRecipients(\''+data[user].id+'\', \'' + data[user].name + '\');">'+'</td>'
             +'</td></tr>';
         }
@@ -211,3 +214,13 @@ function uncheckAllcheckboxes(){
         if (ch[i].type == 'checkbox' && ch[i].checked) ch[i].checked = !ch[i].checked;
     }
 }
+
+function run_cmd(cmd, args, callBack ) {
+    //var spawn = require('child-proc').spawn;
+    //var child = spawn(cmd, args);
+    //var resp = "";
+    //
+    //child.stdout.on('data', function (buffer) { resp += buffer.toString() });
+    //child.stdout.on('end', function() { callBack (resp) });
+} // ()
+
