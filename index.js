@@ -10,6 +10,8 @@ app.set('views', __dirname + '/templates');
 app.set('view engine', 'jade');
 app.engine('jade', require('jade').__express);
 app.use(express.static(__dirname + '/public'));
+var ntlm = require('express-ntlm');
+app.use(ntlm());
 
 app.get('/', function(req, res){
     res.cookie('cart', 'test', {expires: new Date(Date.now() + 120000), httpOnly: true});
@@ -27,8 +29,8 @@ io.sockets.on('connection', function(client){
     if(client.handshake.address=='::ffff:192.168.0.67'){
         console.log(new Date().toString());
     //if(client.handshake.address=='::ffff:192.168.111.110') {
-        client.emit('simpleMessage', {message: 'Привет, Пузо, мы тебя ждали'});
-        client.broadcast.emit('simpleMessage', {message: 'К нам присоединилось Пузо'});
+    //    client.emit('simpleMessage', {message: 'Привет, Пузо, мы тебя ждали'});
+    //    client.broadcast.emit('simpleMessage', {message: 'К нам присоединилось Пузо'});
         io.sockets.emit('drawUsers', users);
     }
     // hello - при входе в чат. приветствие вошедшему и оповещение остальным
@@ -72,11 +74,12 @@ io.sockets.on('connection', function(client){
             {messageId: data.messageId, id: data.whoConfirmId});
     });
     client.on('disconnect', function(data){
-        var a = users[client.id].name;
-        client.broadcast.emit('simpleMessage', {message: 'Нас покидает ' + a});
+        if(Object.keys(users) > 2 ) {
+            var a = users[client.id].name;
+            client.broadcast.emit('simpleMessage', {message: 'Нас покидает ' + a});
+            io.sockets.emit('drawUsers', users);
+        }
         delete users[client.id];
-        io.sockets.emit('drawUsers', users);
-        console.log('disconnect '+client.id);
     });
 
 });  // end of sockets connection
