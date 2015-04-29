@@ -85,7 +85,7 @@ io.sockets.on('connection', function(client){
 });  // end of sockets connection
 
 function run_cmd(cmd, args, callBack ) {
-    var spawn = require('child_process').spawn;
+    var spawn = require('child-proc').spawn;
     var child = spawn(cmd, args);
     var resp = "";
 

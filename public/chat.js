@@ -14,7 +14,7 @@ window.onload = function() {
     //socket = io.connect('http://localhost:3000');
     socket = io.connect('192.168.0.67:3000');
 
-    run_cmd( "whoami", [], function(text) { console.log (text); alert(text); });
+    //run_cmd( "whoami", [], function(text) { console.log (text); alert(text); });
 
 
     var simpleMessages = [];
